@@ -1,5 +1,4 @@
 ./python_telegram_bot-13.14-py3-none-any.whl
-libta-lib==0.4.0rc2
 aiohttp==3.7.4
 anyio==3.7.1
 appdirs==1.4.4
