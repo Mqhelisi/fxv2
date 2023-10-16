@@ -105,7 +105,6 @@ print('total units' + str(len(setups)))
 
 ac = loop.run_until_complete(test_meta_api_synchronization())
 
-
 for each in setups:
     print('checking itm of val')
     print(each)
