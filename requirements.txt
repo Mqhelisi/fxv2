@@ -37,13 +37,11 @@ httpcore==0.15.0
 httpx==0.23.0
 idna==2.10
 importlib-metadata==5.2.0
-ipykernel==6.25.2
 ipython==8.16.1
 iso8601==2.1.0
 itsdangerous==2.1.2
 jedi==0.19.1
 Jinja2==3.1.2
-jupyter_client==8.4.0
 jupyter_core==5.4.0
 MarkupSafe==2.1.1
 matplotlib-inline==0.1.6
