@@ -184,7 +184,7 @@ def getIndicFxn(df,setup,indcnt):
 #         a = "tstdf['"+indicc+"']" + ","+"tstdf['"+indicc+"2']" +","+ " = talib." + indicc + "(" + high + ","+ low + ","+ close +a
 #         return a
     a = "tstdf['" +indicc + "']= tstdf.ta." + indicc + "(" +a
-    print(a)
+    # print(a)
     return a
 
 def controlIndicators(tstdf,setupp):
