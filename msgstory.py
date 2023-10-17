@@ -2,13 +2,13 @@ import json
 # import MetaTrader5 as mt5
 from datetime import datetime, timedelta
 import pandas as pd
-import talib
 import pandas as pd
 import telegram_send
 import os
 import asyncio
 from metaapi_cloud_sdk import MetaApi
 from metaapi_cloud_sdk.clients.metaApi.tradeException import TradeException
+from candlestick import candlestick
 
 # Note: for information on how to use this example code please read https://metaapi.cloud/docs/client/usingCodeExamples
 loop2 = asyncio.get_event_loop()
@@ -131,10 +131,10 @@ def getcandle(df,setup):
     high = "tstdf['high']"
     low = "tstdf['low']"
     close = "tstdf['close']"
-
-    a = "tstdf['"+setup['candlepattern']+"']" + " = talib." + setup['candlepattern'] + "(" + openn + "," + high + ","+ low + ","+ close +")"
-    # print(a)
+    a = "candlestick." + setup['candlepattern'] + '(tstdf, target="'+ setup['candlepattern'] +'")'
+    print(a)
     return a
+
 def inRange(row,setup):
     val = setup['range']*0.01
     
@@ -149,11 +149,75 @@ def paRange(inp,val,trgt):
         return True
     else:
         return False
+   
+def getIndicFxn(df,setup,indcnt):
+#     indlist1v = pd.read_excel('allind.xlsx')
 
+    if indcnt == 1:
+
+#         indic = indlist1v[indlist1v['value'] == setup['indicator1']].to_dict('records')[0]
+        indicc = setup['indicator1']
+    elif indcnt == 2:
+     
+        
+        indicc = setup['indicator2']
+        
+    a = ""
+    prm = 'params'+str(indcnt)
+    if(setup[prm] is not None):
+        for each in setup[prm]:
+            a=a + " "+each+"="+ str(setup[prm][each]) +""
+
+    a=a+")"
+    
+
+    high = "tstdf['high']"
+    low = "tstdf['low']"
+    close = "tstdf['close']"
+    if 'ma' in indicc or 'above' in indicc or 'below' in indicc:
+        
+        a = "tstdf['" +indicc + "'] = tstdf.ta." + indicc + "(" + a
+        print(a)
+        return a
+
+#     if indicc == "STOCH":
+#         a = "tstdf['"+indicc+"']" + ","+"tstdf['"+indicc+"2']" +","+ " = talib." + indicc + "(" + high + ","+ low + ","+ close +a
+#         return a
+    a = "tstdf['" +indicc + "']= tstdf.ta." + indicc + "(" +a
+    print(a)
+    return a
+
+def controlIndicators(tstdf,setupp):
+# get the chart, MAKE IT DESCENDING ORDER OF DATE?? get last price isolated??
+    # search chart for indicator 1
+    if setupp['indicator1'] != None:
+    #     print('found ind1')
+        exec(getIndicFxn(tstdf,setupp,1))
+    # search for indicator 2
+    if setupp['indicator2'] != None:
+    #     print('found ind2')
+    
+        exec(getIndicFxn(tstdf,setupp,2))
+    # search for candlestick
+    if setupp['candlepattern'] != None:
+        print('gvhjnkcfgjkhgvcfbjhkbhgvhg')
+        cmnd=getcandle(tstdf,setupp)
+        tstdf = eval(cmnd)
+    # search if in range
+    tstdf['inRange'] = tstdf.apply(lambda x: inRange(x,setupp), axis=1)
+    # search records for if they fit the required params
+
+    return tstdf
+
+
+def siphakthi(tstdf,setp):
+    tstdf['WEIN?'] = tstdf.apply(lambda x: are_we_in(x,setp), axis=1)
+    return tstdf
 def are_we_in(row,setup):
     chck=dict()
     val = setup['range']*0.01
     if setup['ind1v'] != None:
+#         print(row)
         if paRange(row[setup['indicator1']],4,setup['ind1v']):
     #         print('param1True')
             chck[setup['indicator1']] = True
@@ -168,12 +232,12 @@ def are_we_in(row,setup):
             chck[setup['indicator2']] = True
         else:
             chck[setup['indicator2']] = False
-    # print(setup['candlepattern'])
+#     print(row)
     if(setup['candlepattern'] == None):
         chck[setup['candlepattern']] = True
 
-    elif(row[setup['candlepattern']] != setup['cdlval']):
-        chck[setup['candlepattern']] = False
+    elif(row[setup['candlepattern']] != True):
+        chck[setup['candlepattern']] = row[setup['candlepattern']]
     else:
         chck[setup['candlepattern']] = True
     chck['range'] = row['inRange']
@@ -184,66 +248,7 @@ def are_we_in(row,setup):
         return True
     else:
         return False  
-    
-def getIndicFxn(df,setup,indcnt):
-    indlist1v = pd.read_excel('allind.xlsx')
-
-    if indcnt == 1:
-
-        indic = indlist1v[indlist1v['value'] == setup['indicator1']].to_dict('records')[0]
-        indicc = setup['indicator1']
-    elif indcnt == 2:
-     
-        indic = indlist1v[indlist1v['value'] == setup['indicator2']].to_dict('records')[0]  
-        indicc = setup['indicator2']
-        
-    a = ""
-    prm = 'params'+str(indcnt)
-    for each in setup[prm]:
-        a=a + ","+each+"="+str(setup[prm][each])
-
-    a=a+")"
-    
-
-    high = "tstdf['high']"
-    low = "tstdf['low']"
-    close = "tstdf['close']"
-    if 'MA' in indicc or indicc == 'APO':
-        a = "tstdf['"+indicc+"']" + " = talib." + indicc + "(" + close + a
-#         print(a)
-        return a
-    if indicc == "STOCH":
-        a = "tstdf['"+indicc+"']" + ","+"tstdf['"+indicc+"2']" +","+ " = talib." + indicc + "(" + high + ","+ low + ","+ close +a
-        return a
-    a = "tstdf['"+indicc+"']" + " = talib." + indicc + "(" + high + ","+ low + ","+ close +a
-    # print(a)
-    return a
-
-def controlIndicators(tstdf,setupp):
-# get the chart, MAKE IT DESCENDING ORDER OF DATE?? get last price isolated??
-#     tstdf = getChart(setupp).copy() 
-    # search chart for indicator 1
-    if setupp['ind1v'] != None:
-    #     print('found ind1')
-        exec(getIndicFxn(tstdf,setupp,1))
-    # search for indicator 2
-    if setupp['ind2v'] != None:
-    #     print('found ind2')
-        exec(getIndicFxn(tstdf,setupp,2))
-    # search for candlestick
-    if setupp['candlepattern'] != None:
-
-        exec(getcandle(tstdf,setupp))
-    # search if in range
-    tstdf['inRange'] = tstdf.apply(lambda x: inRange(x,setupp), axis=1)
-    # search records for if they fit the required params
-
-    return tstdf
-
-def siphakthi(tstdf,setp):
-    tstdf['WEIN?'] = tstdf.apply(lambda x: are_we_in(x,setp), axis=1)
-
-    return tstdf
+  
 def historialsigs(tstdf, setupp):
     print(setupp)
     tstdf = controlIndicators(tstdf,setupp)
@@ -257,6 +262,11 @@ def historialsigs(tstdf, setupp):
         # msgbdy = 'asset: ' + setupp['asset'] + ', TF:' + setupp['TimeFrame'] + ', price:' + setupp['price'] + ', candle:' + setupp['TimeFrame']+ ', indic1:' + setupp['indicator1'] + ', indic2:' + setupp['indicator2']
 
         return "results found!", fnldf
+
+
+
+
+
 def is_recent(tstdf,mins):
 #     print(tstdf)
 
@@ -297,12 +307,12 @@ def make_check(chart,instrct):
         return trupts
 
 
-def job1(setup):
-    print('doing test for setup with asset: ' + setup['asset'] + ' and timeframe ' + setup['TimeFrame']  )
-    resultfr = make_check(setup)
-#  if resultfr is not empty take the last value and send it as a text
-    if resultfr.empty:
-        return 'no result'
+# def job1(setup):
+#     print('doing test for setup with asset: ' + setup['asset'] + ' and timeframe ' + setup['TimeFrame']  )
+#     resultfr = make_check(setup)
+# #  if resultfr is not empty take the last value and send it as a text
+#     if resultfr.empty:
+#         return 'no result'
 
 
 

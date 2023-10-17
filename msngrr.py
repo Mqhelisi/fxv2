@@ -2,7 +2,6 @@ import pandas as pd
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import json
-import talib
 from datetime import datetime, timedelta
 from msgstory import make_check,anotherChart,send_txt, test_meta_api_synchronization
 import asyncio
