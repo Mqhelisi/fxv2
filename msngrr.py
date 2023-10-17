@@ -11,8 +11,8 @@ from sqlalchemy.orm import sessionmaker
 import pandas_ta as ta
 whole_start = datetime.now().timestamp()
 loop = asyncio.get_event_loop()
-engine = create_engine("postgresql+psycopg2://postgres:Mqhe23@localhost/fx")
-# engine = create_engine("postgresql+psycopg2://krtl_fx_stp_user:9XWzSV0Qr8kBZa371ZTPoH5Y0AXkeXwf@dpg-ckkpju3j89us73a0a5t0-a.oregon-postgres.render.com/krtl_fx_stp")
+# engine = create_engine("postgresql+psycopg2://postgres:Mqhe23@localhost/fx")
+engine = create_engine("postgresql+psycopg2://krtl_fx_stp_user:9XWzSV0Qr8kBZa371ZTPoH5Y0AXkeXwf@dpg-ckkpju3j89us73a0a5t0-a.oregon-postgres.render.com/krtl_fx_stp")
 
 Session = sessionmaker(bind=engine)
 session = Session()
