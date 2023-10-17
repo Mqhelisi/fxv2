@@ -65,7 +65,7 @@ def send_txt(resrow,setuppp):
     openn = "Open Price at: " + str(a2['open'])
     # tickvol = "Tick Volume of: " + str(a2['tick_volume'])
     textt = asst + '\n' + asst1 + '\n' + tyme + '\n' + openn 
-    res = telegram_send.send(messages=[textt])
+    res = telegram_send.send(messages=[textt],conf='./tg.config')
     # print(res)    
     return True
 
