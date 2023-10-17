@@ -83,7 +83,7 @@ stack-data==0.6.3
 talipp==1.9.1
 telegram-send==0.34
 tenacity==8.2.2
-tornado==6.3.3
+tornado==6.1
 traitlets==5.11.2
 twilio==7.17.0
 typing_extensions==4.8.0
