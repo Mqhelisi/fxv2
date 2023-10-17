@@ -9,7 +9,7 @@ import asyncio
 from metaapi_cloud_sdk import MetaApi
 from metaapi_cloud_sdk.clients.metaApi.tradeException import TradeException
 from candlestick import candlestick
-
+import pandas_ta as ta
 # Note: for information on how to use this example code please read https://metaapi.cloud/docs/client/usingCodeExamples
 loop2 = asyncio.get_event_loop()
 
@@ -63,8 +63,8 @@ def send_txt(resrow,setuppp):
     asst1 = "Indicator for asset: " + setuppp['asset']
     tyme = "Found at time: " + str(a2['date'])
     openn = "Open Price at: " + str(a2['open'])
-    tickvol = "Tick Volume of: " + str(a2['tick_volume'])
-    textt = asst + '\n' + asst1 + '\n' + tyme + '\n' + openn + '\n' + tickvol
+    # tickvol = "Tick Volume of: " + str(a2['tick_volume'])
+    textt = asst + '\n' + asst1 + '\n' + tyme + '\n' + openn 
     res = telegram_send.send(messages=[textt])
     # print(res)    
     return True
