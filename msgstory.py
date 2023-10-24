@@ -52,6 +52,7 @@ async def test_meta_api_synchronization():
 
     return account
 
+
 def send_txt(resrow,setuppp):
     a2 = resrow.to_dict()
     print(a2)
@@ -63,7 +64,7 @@ def send_txt(resrow,setuppp):
     asst1 = "Indicator for asset: " + setuppp['asset']
     tyme = "Found at time: " + str(a2['date'])
     openn = "Open Price at: " + str(a2['open'])
-    # tickvol = "Tick Volume of: " + str(a2['tick_volume'])
+    tickvol = "Comment: " + str(a2['contact'])
     textt = asst + '\n' + asst1 + '\n' + tyme + '\n' + openn 
     res = telegram_send.send(messages=[textt],conf='./tg.config')
     # print(res)    
@@ -120,11 +121,6 @@ async def anotherChart(asst,account):
     return prcDf
 
 
-
-
-
-
-
 def getcandle(df,setup):
 
     openn = "tstdf['open']"
@@ -135,6 +131,7 @@ def getcandle(df,setup):
     print(a)
     return a
 
+
 def inRange(row,setup):
     val = setup['range']*0.01
     
@@ -143,12 +140,14 @@ def inRange(row,setup):
     else:
         return False
 
+
 def paRange(inp,val,trgt):
     val = val*0.01
     if trgt*(1-val) <= inp <= trgt*(1+val):
         return True
     else:
         return False
+   
    
 def getIndicFxn(df,setup,indcnt):
 #     indlist1v = pd.read_excel('allind.xlsx')
@@ -289,12 +288,12 @@ def make_check(chart,instrct):
             print('recent find, ' + str(int(howrecent)) +'mins ago')
             # print(trupts[trupts['WEIN?'] == True].iloc[-1])
 
-            res = send_txt(trupts[trupts['WEIN?'] == True].iloc[-1],instrct)
+            # res = send_txt(trupts[trupts['WEIN?'] == True].iloc[-1],instrct)
 
-            if res == True:
-                print("sent message")
-            else:
-                print("no message sent")
+            # if res == True:
+            #     print("sent message")
+            # else: 
+            #     print("no message sent")
             
             return trupts[trupts['WEIN?'] == True].iloc[-1]
         else:

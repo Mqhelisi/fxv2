@@ -53,8 +53,7 @@ class Setting(Base):
     def __init__(self, asset,price,prange,ind1,ind2,indvars1,indvars2,
                  candle,timeframe,dateExp,ind1v,ind2v,ind1c,ind2c,cdlval,active,contacts):
         self.asset = asset
-        self.price = pr
-        ice
+        self.price = price
         self.prange = prange
         self.ind1 = ind1
         self.ind2 = ind2
