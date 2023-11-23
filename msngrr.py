@@ -11,7 +11,9 @@ from sqlalchemy.orm import sessionmaker
 import pandas_ta as ta
 whole_start = datetime.now().timestamp()
 loop = asyncio.get_event_loop()
+
 # engine = create_engine("postgresql+psycopg2://postgres:Mqhe23@localhost/fx")
+
 engine = create_engine("postgresql+psycopg2://krtl_fx_stp_user:9XWzSV0Qr8kBZa371ZTPoH5Y0AXkeXwf@dpg-ckkpju3j89us73a0a5t0-a.oregon-postgres.render.com/krtl_fx_stp")
 
 Session = sessionmaker(bind=engine)
@@ -93,7 +95,8 @@ class Setting(Base):
             'Expiry': self.dateExp.strftime("%d/%m %Y %H:%M"),
             'SetDate': self.dateLog.strftime("%d/%m %Y %H:%M")
         } 
-   
+
+
 print('doing job 1')
 
 stp = session.query(Setting).filter_by(active=True)
@@ -110,11 +113,11 @@ for each in setups:
 
     chart2 = loop.run_until_complete(anotherChart(each['asset'],ac))
 
-    resfrm = make_check(chart2,each)
+    resfrm, candless = make_check(chart2,each)
     if resfrm.empty:
         print( 'no result')
     else:
-        res = send_txt(resfrm, setuppp=each)
+        res = send_txt(resfrm, candless, setuppp=each)
 
         if res == True:
             print( "sent message")

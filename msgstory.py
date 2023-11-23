@@ -53,7 +53,7 @@ async def test_meta_api_synchronization():
     return account
 
 
-def send_txt(resrow,setuppp):
+def send_txt(resrow,cdls,setuppp):
     a2 = resrow.to_dict()
     print(a2)
 
@@ -65,25 +65,14 @@ def send_txt(resrow,setuppp):
     tyme = "Found at time: " + str(a2['date'])
     openn = "Open Price at: " + str(a2['open'])
     tickvol = "Comment: " + str(a2['contact'])
-    textt = asst + '\n' + asst1 + '\n' + tyme + '\n' + openn 
+    olap = "AMount of verlapped candles: " + str(cdls)
+
+    textt = asst + '\n' + asst1 + '\n' + tyme + '\n' + openn + '\n' + tickvol  + '\n' + olap 
     res = telegram_send.send(messages=[textt],conf='./tg.config')
     # print(res)    
     return True
 
 
-def getChart(setup):
-    res = {'5Min': 5,'15Min': 15, '30Min': 30, '1H': 60, '2H': 120, '4H': 360, '12H': 720}    
-    timeframe = res[setup['TimeFrame']] # integer value representing minutes
-    start_bar = 0 # initial position of first bar
-    num_bars = 10000 # number of bars
-
-    # bars = mt5.cop    `y_rates_from_pos(setup['asset'], timeframe, start_bar, num_bars)
-#     print(bars)
-    ticks_frame = pd.DataFrame(bars)
-    ticks_frame['date'] = pd.to_datetime(ticks_frame['time'],unit='s')
-    ticks_frame = ticks_frame.drop('time', axis=1)
-
-    return ticks_frame
 
 
 async def anotherChart(asst,account):
@@ -263,9 +252,6 @@ def historialsigs(tstdf, setupp):
         return "results found!", fnldf
 
 
-
-
-
 def is_recent(tstdf,mins):
 #     print(tstdf)
 
@@ -275,43 +261,59 @@ def is_recent(tstdf,mins):
     return latestdiff < timedelta(minutes=mins), tz_corrected_mins
 
 
+def testhwmany(df,tstdf,vibe):
+
+    df = df[:tstdf.name].iloc[::-1].tail(-1)
+
+    ct = 0
+    if vibe == 'bullish':
+        for ind in df.index:
+
+                if(df['close'][ind]>tstdf['close']):
+                    break
+                else:
+                    ct+=1
+    
+    else:
+        for ind in df.index:
+
+                if(df['close'][ind]<tstdf['close']):
+                    break
+                else:
+                    ct+=1
+
+            
+    return ct
+        
+    
 def make_check(chart,instrct):
     # chart = loop2.run_until_complete(anotherChart(instrct,acc))
     
     # chart = await anotherChart(instrct,acc)
     resp,trupts = historialsigs(chart,instrct)
-
+    prevCdls = 0                                                                           
     if not trupts.empty:
-        print(trupts)
+  
         truth, howrecent = is_recent(trupts,30)
         if(int(howrecent) < 16):
             print('recent find, ' + str(int(howrecent)) +'mins ago')
-            # print(trupts[trupts['WEIN?'] == True].iloc[-1])
 
-            # res = send_txt(trupts[trupts['WEIN?'] == True].iloc[-1],instrct)
-
-            # if res == True:
-            #     print("sent message")
-            # else: 
-            #     print("no message sent")
-            
-            return trupts[trupts['WEIN?'] == True].iloc[-1]
+            if instrct['candlepattern'] == 'bullish_engulfing':
+                latestfr = trupts[trupts['bullish_engulfing'] == True].iloc[-1]
+                prevCdls = testhwmany(trupts,latestfr,'bullish')
+                print(prevCdls)
+                return trupts[trupts['WEIN?'] == True].iloc[-1], prevCdls
+            elif instrct['candlepattern'] == 'bearish_engulfing':
+                latestfr = trupts[trupts['bearish_engulfing'] == True].iloc[-1]
+                prevCdls = testhwmany(trupts,latestfr,'bearish')
+                print(prevCdls)
+                return trupts[trupts['WEIN?'] == True].iloc[-1], prevCdls
+            return trupts[trupts['WEIN?'] == True].iloc[-1],0
         else:
             print('old find, ' + str(int(howrecent)) +'mins ago')
             print(trupts[trupts['WEIN?'] == True].iloc[-1])
             # return trupts[trupts['WEIN?'] == True].iloc[-1]
-            return pd.DataFrame()
+            return pd.DataFrame(),0
     else:
         print(resp)
-        return trupts
-
-
-# def job1(setup):
-#     print('doing test for setup with asset: ' + setup['asset'] + ' and timeframe ' + setup['TimeFrame']  )
-#     resultfr = make_check(setup)
-# #  if resultfr is not empty take the last value and send it as a text
-#     if resultfr.empty:
-#         return 'no result'
-
-
-
+        return trupts,0
